@@ -2,9 +2,22 @@ import psycopg2
 import sys
 
 def print_specific_word_count(word):
+  query = 'SELECT count FROM Tweetwordcount WHERE word = %s';
 
-  print( 'yo ' + word )
+  conn = get_connection()
+  cur = conn.cursor()
+  cur.execute(query, (word, ))
+  records = cur.fetchall()
 
+  try:
+    # take the first cell of the first row
+    count = records.__iter__().next()[0]
+    print ( 'Total number of occurences of "%s": %d' % ( word, count ) )
+
+  except StopIteration:
+    print ( 'The word %s was not found in the data set' % ( word, ) )
+
+  conn.close()
 
 def print_ascending_word_counts():
   query = 'SELECT word, count FROM Tweetwordcount ORDER BY word ASC, count ASC';
